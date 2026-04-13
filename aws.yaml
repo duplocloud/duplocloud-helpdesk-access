@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Grants DuploCloud access to your AWS account and EKS cluster
+  for pre-sales analysis. Takes 2-3 minutes to deploy.
+
+Parameters:
+  DuploCloudAccountId:
+    Type: String
+    Description: "DuploCloud AWS Account ID (provided by DuploCloud)"
+    AllowedPattern: "[0-9]{12}"
+    ConstraintDescription: "Must be a 12-digit AWS account ID"
+
+  EKSClusterName:
+    Type: String
+    Description: "Name of the EKS cluster to analyze"
+    AllowedPattern: "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,99}"
+    ConstraintDescription: "1-100 chars, letters/numbers/hyphens, must start with a letter or digit"
+
+  AdminAccess:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: >
+      When true (default), creates an admin IAM role with AdministratorAccess
+      and AmazonEKSClusterAdminPolicy. A read-only role is always created.
+      Set to false to skip the admin role entirely.
+
+Conditions:
+  CreateAdminRole: !Equals [!Ref AdminAccess, "true"]
+
+Resources:
+
+  # -------------------------------------------------------
+  # Read-Only IAM Role (always created)
+  # -------------------------------------------------------
+  ReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "DuploCloud-ReadOnly-${EKSClusterName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${DuploCloudAccountId}:root"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+
+  ReadOnlyEKSAccessEntry:
+    Type: AWS::EKS::AccessEntry
+    Properties:
+      ClusterName: !Ref EKSClusterName
+      PrincipalArn: !GetAtt ReadOnlyRole.Arn
+      Type: STANDARD
+      AccessPolicies:
+        - PolicyArn: "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
+          AccessScope:
+            Type: cluster
+
+  # -------------------------------------------------------
+  # Admin IAM Role (created when AdminAccess = true)
+  # -------------------------------------------------------
+  AdminRole:
+    Type: AWS::IAM::Role
+    Condition: CreateAdminRole
+    Properties:
+      RoleName: !Sub "DuploCloud-Admin-${EKSClusterName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${DuploCloudAccountId}:root"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  AdminEKSAccessEntry:
+    Type: AWS::EKS::AccessEntry
+    Condition: CreateAdminRole
+    Properties:
+      ClusterName: !Ref EKSClusterName
+      PrincipalArn: !GetAtt AdminRole.Arn
+      Type: STANDARD
+      AccessPolicies:
+        - PolicyArn: "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          AccessScope:
+            Type: cluster
+
+Outputs:
+  ReadOnlyRoleArn:
+    Description: "Read-only Role ARN — provide to DuploCloud"
+    Value: !GetAtt ReadOnlyRole.Arn
+
+  AdminRoleArn:
+    Description: "Admin Role ARN — provide to DuploCloud (only present when AdminAccess=true)"
+    Condition: CreateAdminRole
+    Value: !GetAtt AdminRole.Arn
+
+  ClusterName:
+    Description: "EKS Cluster Name"
+    Value: !Ref EKSClusterName
