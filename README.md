@@ -58,7 +58,7 @@ If your EKS public endpoint is CIDR-restricted, DuploCloud will provide a NAT IP
 
 | Parameter | Description | Default |
 | --- | --- | --- |
-| `HelpdeskAccountId` | Helpdesk AWS Account ID (provided by helpdesk team) | — |
+| `HelpdeskAccountId` | Optional: Helpdesk AWS Account ID for cross-account access. Leave empty for same-account only. | Empty |
 | `EKSClusterName` | Name of the EKS cluster to analyze | — |
 | `EnableAWSAdmin` | Create AWS Admin role (`true`/`false`) | `false` |
 | `EnableAWSReadOnly` | Create AWS Read-Only role (`true`/`false`) | `true` |

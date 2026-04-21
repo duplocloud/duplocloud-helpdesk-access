@@ -7,9 +7,10 @@ Description: >
 Parameters:
   HelpdeskAccountId:
     Type: String
-    Description: "Helpdesk AWS Account ID (provided by helpdesk team)"
-    AllowedPattern: "[0-9]{12}"
-    ConstraintDescription: "Must be a 12-digit AWS account ID"
+    Default: ""
+    Description: "Optional: Helpdesk AWS Account ID for cross-account access. Leave empty for same-account access only."
+    AllowedPattern: "^$|[0-9]{12}"
+    ConstraintDescription: "Must be empty or a 12-digit AWS account ID"
 
   EKSClusterName:
     Type: String
@@ -50,6 +51,7 @@ Parameters:
     Description: "Create EKS Read-Only role with AmazonEKSViewPolicy"
 
 Conditions:
+  HasHelpdeskAccount: !Not [!Equals [!Ref HelpdeskAccountId, ""]]
   CreateAWSAdminRole: !Equals [!Ref EnableAWSAdmin, "true"]
   CreateAWSReadOnlyRole: !Equals [!Ref EnableAWSReadOnly, "true"]
   CreateEKSAdminRole: !Equals [!Ref EnableEKSAdmin, "true"]
@@ -69,8 +71,10 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS:
-                - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+              AWS: !If
+                - HasHelpdeskAccount
+                - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:root"
                 - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
@@ -89,8 +93,10 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS:
-                - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+              AWS: !If
+                - HasHelpdeskAccount
+                - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:root"
                 - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
@@ -109,8 +115,10 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS:
-                - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+              AWS: !If
+                - HasHelpdeskAccount
+                - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:root"
                 - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
 
@@ -139,8 +147,10 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS:
-                - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+              AWS: !If
+                - HasHelpdeskAccount
+                - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:root"
                 - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
 
