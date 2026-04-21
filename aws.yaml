@@ -75,7 +75,7 @@ Resources:
                 - HasHelpdeskAccount
                 - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
                   - !Sub "arn:aws:iam::${AWS::AccountId}:root"
-                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+                - - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
@@ -97,7 +97,7 @@ Resources:
                 - HasHelpdeskAccount
                 - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
                   - !Sub "arn:aws:iam::${AWS::AccountId}:root"
-                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+                - - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/ReadOnlyAccess
@@ -119,7 +119,7 @@ Resources:
                 - HasHelpdeskAccount
                 - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
                   - !Sub "arn:aws:iam::${AWS::AccountId}:root"
-                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+                - - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
 
   EKSAdminAccessEntry:
@@ -151,7 +151,7 @@ Resources:
                 - HasHelpdeskAccount
                 - - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
                   - !Sub "arn:aws:iam::${AWS::AccountId}:root"
-                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+                - - !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: "sts:AssumeRole"
 
   EKSReadOnlyAccessEntry:
