@@ -65,7 +65,7 @@ Resources:
     Type: AWS::IAM::Role
     Condition: CreateAWSAdminRole
     Properties:
-      RoleName: !Sub "DuploCloud-AWS-Admin-${EKSClusterName}"
+      RoleName: "DuploCloud-AWS-Admin"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -87,7 +87,7 @@ Resources:
     Type: AWS::IAM::Role
     Condition: CreateAWSReadOnlyRole
     Properties:
-      RoleName: !Sub "DuploCloud-AWS-ReadOnly-${EKSClusterName}"
+      RoleName: "DuploCloud-AWS-ReadOnly"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:

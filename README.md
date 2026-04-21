@@ -24,8 +24,8 @@ Four independent IAM roles, each enabled/disabled via parameters:
 
 | Role | IAM Policy | EKS Policy | Default |
 | --- | --- | --- | --- |
-| `DuploCloud-AWS-Admin-<cluster>` | `AdministratorAccess` | None | Disabled |
-| `DuploCloud-AWS-ReadOnly-<cluster>` | `ReadOnlyAccess` | None | Enabled |
+| `DuploCloud-AWS-Admin` | `AdministratorAccess` | None | Disabled |
+| `DuploCloud-AWS-ReadOnly` | `ReadOnlyAccess` | None | Enabled |
 | `DuploCloud-EKS-Admin-<cluster>` | None | `AmazonEKSClusterAdminPolicy` | Disabled |
 | `DuploCloud-EKS-ReadOnly-<cluster>` | None | `AmazonEKSViewPolicy` | Enabled |
 
