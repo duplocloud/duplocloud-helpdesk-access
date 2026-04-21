@@ -156,14 +156,25 @@ Resources:
             Type: cluster
 
 Outputs:
-  ReadOnlyRoleArn:
-    Description: "Read-only Role ARN — provide to DuploCloud"
-    Value: !GetAtt ReadOnlyRole.Arn
+  AWSAdminRoleArn:
+    Description: "AWS Admin Role ARN - provide to helpdesk"
+    Condition: CreateAWSAdminRole
+    Value: !GetAtt AWSAdminRole.Arn
 
-  AdminRoleArn:
-    Description: "Admin Role ARN — provide to DuploCloud (only present when AdminAccess=true)"
-    Condition: CreateAdminRole
-    Value: !GetAtt AdminRole.Arn
+  AWSReadOnlyRoleArn:
+    Description: "AWS Read-Only Role ARN - provide to helpdesk"
+    Condition: CreateAWSReadOnlyRole
+    Value: !GetAtt AWSReadOnlyRole.Arn
+
+  EKSAdminRoleArn:
+    Description: "EKS Admin Role ARN - provide to helpdesk"
+    Condition: CreateEKSAdminRole
+    Value: !GetAtt EKSAdminRole.Arn
+
+  EKSReadOnlyRoleArn:
+    Description: "EKS Read-Only Role ARN - provide to helpdesk"
+    Condition: CreateEKSReadOnlyRole
+    Value: !GetAtt EKSReadOnlyRole.Arn
 
   ClusterName:
     Description: "EKS Cluster Name"
