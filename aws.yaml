@@ -4,9 +4,9 @@ Description: >
   for pre-sales analysis. Takes 2-3 minutes to deploy.
 
 Parameters:
-  DuploCloudAccountId:
+  HelpdeskAccountId:
     Type: String
-    Description: "DuploCloud AWS Account ID (provided by DuploCloud)"
+    Description: "Helpdesk AWS Account ID (provided by helpdesk team)"
     AllowedPattern: "[0-9]{12}"
     ConstraintDescription: "Must be a 12-digit AWS account ID"
 
@@ -16,16 +16,37 @@ Parameters:
     AllowedPattern: "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,99}"
     ConstraintDescription: "1-100 chars, letters/numbers/hyphens, must start with a letter or digit"
 
-  AdminAccess:
+  EnableAWSAdmin:
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "Create AWS Admin role with AdministratorAccess policy"
+
+  EnableAWSReadOnly:
     Type: String
     Default: "true"
     AllowedValues:
       - "true"
       - "false"
-    Description: >
-      When true (default), creates an admin IAM role with AdministratorAccess
-      and AmazonEKSClusterAdminPolicy. A read-only role is always created.
-      Set to false to skip the admin role entirely.
+    Description: "Create AWS Read-Only role with ReadOnlyAccess policy"
+
+  EnableEKSAdmin:
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "Create EKS Admin role with AmazonEKSClusterAdminPolicy"
+
+  EnableEKSReadOnly:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "Create EKS Read-Only role with AmazonEKSViewPolicy"
 
 Conditions:
   CreateAdminRole: !Equals [!Ref AdminAccess, "true"]
