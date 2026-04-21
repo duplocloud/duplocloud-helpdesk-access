@@ -1,7 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >
-  Grants DuploCloud access to your AWS account and EKS cluster
-  for pre-sales analysis. Takes 2-3 minutes to deploy.
+  Grants helpdesk granular access to your AWS account and EKS cluster.
+  Create 4 independent roles (AWS admin/read-only, EKS admin/read-only)
+  with individual enable/disable controls. Takes 2-3 minutes to deploy.
 
 Parameters:
   HelpdeskAccountId:
