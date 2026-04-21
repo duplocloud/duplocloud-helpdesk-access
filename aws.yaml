@@ -49,7 +49,10 @@ Parameters:
     Description: "Create EKS Read-Only role with AmazonEKSViewPolicy"
 
 Conditions:
-  CreateAdminRole: !Equals [!Ref AdminAccess, "true"]
+  CreateAWSAdminRole: !Equals [!Ref EnableAWSAdmin, "true"]
+  CreateAWSReadOnlyRole: !Equals [!Ref EnableAWSReadOnly, "true"]
+  CreateEKSAdminRole: !Equals [!Ref EnableEKSAdmin, "true"]
+  CreateEKSReadOnlyRole: !Equals [!Ref EnableEKSReadOnly, "true"]
 
 Resources:
 
