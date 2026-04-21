@@ -4,7 +4,7 @@ This repository provides cloud-provider-specific templates that grant DuploCloud
 
 ## Overview
 
-Each template creates cross-account credentials and Kubernetes access bindings needed for DuploCloud to connect during a pre-sales engagement. Admin access is granted by default and can be scoped down to read-only if preferred. Deployment takes 2-3 minutes.
+Each template creates cross-account credentials and Kubernetes access bindings needed for DuploCloud to connect during a pre-sales engagement. Four independent roles are available, with read-only access enabled by default and admin access disabled by default. Deployment takes 2-3 minutes.
 
 ## Supported Platforms
 
@@ -87,10 +87,10 @@ Use this link to open the CloudFormation console with the template pre-loaded. R
 
 [Launch in CloudFormation](https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?templateURL=https%3A%2F%2Fs3.amazonaws.com%2Fduplocloud-public-cfn%2Fduplocloud-eks-access.yaml&stackName=DuploCloud-EKS-Access&param_HelpdeskAccountId=ACCOUNT_ID&param_EKSClusterName=)
 
-> The template is hosted at `s3://duplocloud-public-cfn/duplocloud-eks-readonly.yaml`. After any template change, upload with:
+> The template is hosted at `s3://duplocloud-public-cfn/duplocloud-eks-access.yaml`. After any template change, upload with:
 
 ```bash
-aws s3 cp duplocloud-eks-readonly.yaml s3://duplocloud-public-cfn/duplocloud-eks-readonly.yaml --acl public-read
+aws s3 cp duplocloud-eks-access.yaml s3://duplocloud-public-cfn/duplocloud-eks-access.yaml --acl public-read
 ```
 
 ### Implementation Checklist
