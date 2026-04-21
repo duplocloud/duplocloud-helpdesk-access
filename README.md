@@ -20,22 +20,26 @@ Each template creates cross-account credentials and Kubernetes access bindings n
 
 ### What Gets Created
 
-A read-only role is always created. An admin role is created by default and can be disabled via the `AdminAccess` parameter.
+Four independent IAM roles, each enabled/disabled via parameters:
 
-| Role | IAM Policy | EKS Policy | When Created |
+| Role | IAM Policy | EKS Policy | Default |
 | --- | --- | --- | --- |
-| `DuploCloud-ReadOnly-<cluster>` | `ReadOnlyAccess` | `AmazonEKSViewPolicy` | Always |
-| `DuploCloud-Admin-<cluster>` | `AdministratorAccess` | `AmazonEKSClusterAdminPolicy` | `AdminAccess=true` (default) |
+| `DuploCloud-AWS-Admin-<cluster>` | `AdministratorAccess` | None | Disabled |
+| `DuploCloud-AWS-ReadOnly-<cluster>` | `ReadOnlyAccess` | None | Enabled |
+| `DuploCloud-EKS-Admin-<cluster>` | None | `AmazonEKSClusterAdminPolicy` | Disabled |
+| `DuploCloud-EKS-ReadOnly-<cluster>` | None | `AmazonEKSViewPolicy` | Enabled |
 
 ### Architecture
 
 ```text
 Your AWS Account
   └── CloudFormation Stack
-        ├── ReadOnlyRole          (IAM Role — ReadOnlyAccess)
-        ├── ReadOnlyEKSAccessEntry (AmazonEKSViewPolicy)
-        ├── AdminRole             (IAM Role — AdministratorAccess) [if AdminAccess=true]
-        └── AdminEKSAccessEntry   (AmazonEKSClusterAdminPolicy)   [if AdminAccess=true]
+        ├── AWSAdminRole           (IAM — AdministratorAccess) [if EnableAWSAdmin=true]
+        ├── AWSReadOnlyRole        (IAM — ReadOnlyAccess) [if EnableAWSReadOnly=true]
+        ├── EKSAdminRole           (IAM — no policies) [if EnableEKSAdmin=true]
+        ├── EKSAdminAccessEntry    (AmazonEKSClusterAdminPolicy) [if EnableEKSAdmin=true]
+        ├── EKSReadOnlyRole        (IAM — no policies) [if EnableEKSReadOnly=true]
+        └── EKSReadOnlyAccessEntry (AmazonEKSViewPolicy) [if EnableEKSReadOnly=true]
 ```
 
 ### Tier 2 Access (Optional)
@@ -54,16 +58,21 @@ If your EKS public endpoint is CIDR-restricted, DuploCloud will provide a NAT IP
 
 | Parameter | Description | Default |
 | --- | --- | --- |
-| `DuploCloudAccountId` | DuploCloud AWS Account ID (provided by DuploCloud) | — |
+| `HelpdeskAccountId` | Helpdesk AWS Account ID (provided by helpdesk team) | — |
 | `EKSClusterName` | Name of the EKS cluster to analyze | — |
-| `AdminAccess` | Grant admin access at AWS and EKS level (`true`/`false`) | `true` |
+| `EnableAWSAdmin` | Create AWS Admin role (`true`/`false`) | `false` |
+| `EnableAWSReadOnly` | Create AWS Read-Only role (`true`/`false`) | `true` |
+| `EnableEKSAdmin` | Create EKS Admin role (`true`/`false`) | `false` |
+| `EnableEKSReadOnly` | Create EKS Read-Only role (`true`/`false`) | `true` |
 
 ### Outputs
 
 | Output | Description | When Present |
 | --- | --- | --- |
-| `ReadOnlyRoleArn` | Read-only Role ARN — provide to DuploCloud | Always |
-| `AdminRoleArn` | Admin Role ARN — provide to DuploCloud | `AdminAccess=true` only |
+| `AWSAdminRoleArn` | AWS Admin Role ARN — provide to helpdesk | `EnableAWSAdmin=true` |
+| `AWSReadOnlyRoleArn` | AWS Read-Only Role ARN — provide to helpdesk | `EnableAWSReadOnly=true` |
+| `EKSAdminRoleArn` | EKS Admin Role ARN — provide to helpdesk | `EnableEKSAdmin=true` |
+| `EKSReadOnlyRoleArn` | EKS Read-Only Role ARN — provide to helpdesk | `EnableEKSReadOnly=true` |
 | `ClusterName` | EKS Cluster Name | Always |
 
 ### CloudFormation Template
@@ -76,7 +85,7 @@ See [`aws.yaml`](aws.yaml).
 
 Use this link to open the CloudFormation console with the template pre-loaded. Replace `ACCOUNT_ID` with the DuploCloud account ID and fill in `EKSClusterName` in the console.
 
-[Launch in CloudFormation](https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?templateURL=https%3A%2F%2Fs3.amazonaws.com%2Fduplocloud-public-cfn%2Fduplocloud-eks-readonly.yaml&stackName=DuploCloud-EKS-Access&param_DuploCloudAccountId=ACCOUNT_ID&param_EKSClusterName=)
+[Launch in CloudFormation](https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?templateURL=https%3A%2F%2Fs3.amazonaws.com%2Fduplocloud-public-cfn%2Fduplocloud-eks-access.yaml&stackName=DuploCloud-EKS-Access&param_HelpdeskAccountId=ACCOUNT_ID&param_EKSClusterName=)
 
 > The template is hosted at `s3://duplocloud-public-cfn/duplocloud-eks-readonly.yaml`. After any template change, upload with:
 
@@ -88,8 +97,9 @@ aws s3 cp duplocloud-eks-readonly.yaml s3://duplocloud-public-cfn/duplocloud-eks
 
 - [ ] Note your EKS cluster name
 - [ ] Deploy the CloudFormation stack using the quick-create URL or directly in your AWS account
-- [ ] Provide the `ReadOnlyRoleArn` (and `AdminRoleArn` if applicable) output values to DuploCloud
-- [ ] (If CIDR-restricted) Add the NAT IP provided by DuploCloud to your EKS public access CIDRs
+- [ ] Choose which roles to enable (defaults: read-only enabled, admin disabled)
+- [ ] Provide the enabled role ARN output values to the helpdesk team
+- [ ] (If CIDR-restricted) Add the NAT IP provided by helpdesk to your EKS public access CIDRs
 
 ---
 
