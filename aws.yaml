@@ -155,64 +155,6 @@ Resources:
           AccessScope:
             Type: cluster
 
-  # -------------------------------------------------------
-  # Read-Only IAM Role (always created)
-  # -------------------------------------------------------
-  ReadOnlyRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub "DuploCloud-ReadOnly-${EKSClusterName}"
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::${DuploCloudAccountId}:root"
-            Action: "sts:AssumeRole"
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/ReadOnlyAccess
-
-  ReadOnlyEKSAccessEntry:
-    Type: AWS::EKS::AccessEntry
-    Properties:
-      ClusterName: !Ref EKSClusterName
-      PrincipalArn: !GetAtt ReadOnlyRole.Arn
-      Type: STANDARD
-      AccessPolicies:
-        - PolicyArn: "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
-          AccessScope:
-            Type: cluster
-
-  # -------------------------------------------------------
-  # Admin IAM Role (created when AdminAccess = true)
-  # -------------------------------------------------------
-  AdminRole:
-    Type: AWS::IAM::Role
-    Condition: CreateAdminRole
-    Properties:
-      RoleName: !Sub "DuploCloud-Admin-${EKSClusterName}"
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::${DuploCloudAccountId}:root"
-            Action: "sts:AssumeRole"
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
-
-  AdminEKSAccessEntry:
-    Type: AWS::EKS::AccessEntry
-    Condition: CreateAdminRole
-    Properties:
-      ClusterName: !Ref EKSClusterName
-      PrincipalArn: !GetAtt AdminRole.Arn
-      Type: STANDARD
-      AccessPolicies:
-        - PolicyArn: "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          AccessScope:
-            Type: cluster
-
 Outputs:
   ReadOnlyRoleArn:
     Description: "Read-only Role ARN — provide to DuploCloud"
