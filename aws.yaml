@@ -126,6 +126,36 @@ Resources:
             Type: cluster
 
   # -------------------------------------------------------
+  # EKS Read-Only IAM Role (no AWS IAM policies)
+  # -------------------------------------------------------
+  EKSReadOnlyRole:
+    Type: AWS::IAM::Role
+    Condition: CreateEKSReadOnlyRole
+    Properties:
+      RoleName: !Sub "DuploCloud-EKS-ReadOnly-${EKSClusterName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "sts:AssumeRole"
+
+  EKSReadOnlyAccessEntry:
+    Type: AWS::EKS::AccessEntry
+    Condition: CreateEKSReadOnlyRole
+    Properties:
+      ClusterName: !Ref EKSClusterName
+      PrincipalArn: !GetAtt EKSReadOnlyRole.Arn
+      Type: STANDARD
+      AccessPolicies:
+        - PolicyArn: "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
+          AccessScope:
+            Type: cluster
+
+  # -------------------------------------------------------
   # Read-Only IAM Role (always created)
   # -------------------------------------------------------
   ReadOnlyRole:
