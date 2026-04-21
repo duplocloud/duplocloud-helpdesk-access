@@ -76,6 +76,26 @@ Resources:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
   # -------------------------------------------------------
+  # AWS Read-Only IAM Role (no EKS access)
+  # -------------------------------------------------------
+  AWSReadOnlyRole:
+    Type: AWS::IAM::Role
+    Condition: CreateAWSReadOnlyRole
+    Properties:
+      RoleName: !Sub "DuploCloud-AWS-ReadOnly-${EKSClusterName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${HelpdeskAccountId}:root"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+
+  # -------------------------------------------------------
   # Read-Only IAM Role (always created)
   # -------------------------------------------------------
   ReadOnlyRole:
