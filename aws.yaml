@@ -14,9 +14,10 @@ Parameters:
 
   EKSClusterName:
     Type: String
-    Description: "Name of the EKS cluster to analyze"
-    AllowedPattern: "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,99}"
-    ConstraintDescription: "1-100 chars, letters/numbers/hyphens, must start with a letter or digit"
+    Default: ""
+    Description: "Optional: Name of the EKS cluster. Required only if enabling EKS Admin or EKS Read-Only roles."
+    AllowedPattern: "^$|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,99}"
+    ConstraintDescription: "Must be empty or 1-100 chars (letters/numbers/hyphens, must start with letter or digit)"
 
   EnableAWSAdmin:
     Type: String
@@ -52,6 +53,7 @@ Parameters:
 
 Conditions:
   HasHelpdeskAccount: !Not [!Equals [!Ref HelpdeskAccountId, ""]]
+  HasEKSClusterName: !Not [!Equals [!Ref EKSClusterName, ""]]
   CreateAWSAdminRole: !Equals [!Ref EnableAWSAdmin, "true"]
   CreateAWSReadOnlyRole: !Equals [!Ref EnableAWSReadOnly, "true"]
   CreateEKSAdminRole: !Equals [!Ref EnableEKSAdmin, "true"]
@@ -189,4 +191,5 @@ Outputs:
 
   ClusterName:
     Description: "EKS Cluster Name"
+    Condition: HasEKSClusterName
     Value: !Ref EKSClusterName
