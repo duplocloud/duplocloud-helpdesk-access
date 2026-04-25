@@ -14,45 +14,6 @@ Each template creates cross-account credentials and Kubernetes access bindings n
 | Azure | AKS | _Coming soon_ |
 | GCP | GKE | _Coming soon_ |
 
----
-
-## AWS + EKS
-
-### What Gets Created
-
-Four independent IAM roles, each enabled/disabled via parameters:
-
-| Role | IAM Policy | EKS Policy | Default |
-| --- | --- | --- | --- |
-| `DuploCloud-AWS-Admin` | `AdministratorAccess` | None | Disabled |
-| `DuploCloud-AWS-ReadOnly` | `ReadOnlyAccess` | None | Enabled |
-| `DuploCloud-EKS-Admin-<cluster>` | None | `AmazonEKSClusterAdminPolicy` | Disabled |
-| `DuploCloud-EKS-ReadOnly-<cluster>` | None | `AmazonEKSViewPolicy` | Enabled |
-
-### Architecture
-
-```text
-Your AWS Account
-  └── CloudFormation Stack
-        ├── AWSAdminRole           (IAM — AdministratorAccess) [if EnableAWSAdmin=true]
-        ├── AWSReadOnlyRole        (IAM — ReadOnlyAccess) [if EnableAWSReadOnly=true]
-        ├── EKSAdminRole           (IAM — no policies) [if EnableEKSAdmin=true]
-        ├── EKSAdminAccessEntry    (AmazonEKSClusterAdminPolicy) [if EnableEKSAdmin=true]
-        ├── EKSReadOnlyRole        (IAM — no policies) [if EnableEKSReadOnly=true]
-        └── EKSReadOnlyAccessEntry (AmazonEKSViewPolicy) [if EnableEKSReadOnly=true]
-```
-
-### Tier 2 Access (Optional)
-
-If your EKS public endpoint is CIDR-restricted, DuploCloud will provide a NAT IP to add to your cluster's public access CIDRs.
-
-### Decision Matrix
-
-| Scenario | Action |
-| --- | --- |
-| EKS public endpoint is open | Deploy the template; no extra steps |
-| EKS public endpoint is CIDR-restricted | Deploy the template, then add the IP provided by DuploCloud |
-| EKS endpoint is fully private | Contact DuploCloud for alternative access options |
 
 ### Parameters
 
@@ -78,47 +39,3 @@ If your EKS public endpoint is CIDR-restricted, DuploCloud will provide a NAT IP
 ### CloudFormation Template
 
 See [`aws.yaml`](aws.yaml).
-
-### Deploy via Quick-Create URL
-
-> **Automated:** GitHub Actions automatically publishes `aws.yaml` to S3 on commits to `main`. Dev versions are uploaded as `aws-{source-branch}-{sha}.yaml` on pushes and PRs to `dev`.
-
-Use this link to open the CloudFormation console with the template pre-loaded. Replace `ACCOUNT_ID` with the DuploCloud account ID and fill in `EKSClusterName` in the console.
-
-[Launch in CloudFormation](https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?templateURL=https%3A%2F%2Fs3.amazonaws.com%2Fduplocloud-public-cfn%2Fduplocloud-eks-access.yaml&stackName=DuploCloud-EKS-Access&param_HelpdeskAccountId=ACCOUNT_ID&param_EKSClusterName=)
-
-> The template is hosted at `s3://duplocloud-public-cfn/duplocloud-eks-access.yaml`. After any template change, upload with:
-
-```bash
-aws s3 cp duplocloud-eks-access.yaml s3://duplocloud-public-cfn/duplocloud-eks-access.yaml --acl public-read
-```
-
-### Implementation Checklist
-
-- [ ] Note your EKS cluster name
-- [ ] Deploy the CloudFormation stack using the quick-create URL or directly in your AWS account
-- [ ] Choose which roles to enable (defaults: read-only enabled, admin disabled)
-- [ ] Provide the enabled role ARN output values to the helpdesk team
-- [ ] (If CIDR-restricted) Add the NAT IP provided by helpdesk to your EKS public access CIDRs
-
----
-
-## Azure + AKS
-
-> **Coming soon.** This section will cover granting DuploCloud access to an Azure subscription and AKS cluster.
-
-_Planned approach:_
-
-- Azure AD application registration with Owner/Contributor role on the subscription
-- AKS `cluster-admin` ClusterRoleBinding for the service principal
-
----
-
-## GCP + GKE
-
-> **Coming soon.** This section will cover granting DuploCloud access to a GCP project and GKE cluster.
-
-_Planned approach:_
-
-- GCP service account with `roles/owner` on the project
-- GKE `cluster-admin` ClusterRoleBinding for the service account
