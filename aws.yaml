@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >
-  Grants helpdesk granular access to your AWS account and EKS cluster.
-  Create 4 independent roles (AWS admin/read-only, EKS admin/read-only)
+  Grants DuploCloud HelpDesk granular access to your AWS account and EKS cluster.
+  Creates 4 independent roles (AWS admin/read-only, EKS admin/read-only)
   with individual enable/disable controls. Takes 2-3 minutes to deploy.
 
 Parameters:
