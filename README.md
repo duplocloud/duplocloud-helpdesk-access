@@ -81,7 +81,7 @@ See [`aws.yaml`](aws.yaml).
 
 ### Deploy via Quick-Create URL
 
-> **TODO:** Create a CI/CD pipeline in this repo to automatically publish `aws.yaml` to public S3 bucket
+> **Automated:** GitHub Actions automatically publishes `aws.yaml` to S3 on commits to `main`. Dev versions are uploaded as `aws-{branch}-{sha}.yaml` on PRs to `dev`.
 
 Use this link to open the CloudFormation console with the template pre-loaded. Replace `ACCOUNT_ID` with the DuploCloud account ID and fill in `EKSClusterName` in the console.
 
