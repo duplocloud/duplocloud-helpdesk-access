@@ -1,0 +1,39 @@
+name: "Dev: Upload to S3"
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  upload:
+    name: Upload versioned aws.yaml to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup DuploCtl
+        uses: duplocloud/actions/setup@v1
+        with:
+          duplo_host: https://prod.duplocloud.net
+          duplo_token: ${{ secrets.DUPLO_PROD_TOKEN }}
+        env:
+          DUPLO_TENANT_ID: 5cd3b897-e4d2-4049-85b8-8dd9ab5232de
+
+      - name: Generate versioned filename
+        id: filename
+        run: |
+          BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          FILENAME="aws-${BRANCH_NAME}-${SHORT_SHA}.yaml"
+          echo "filename=${FILENAME}" >> $GITHUB_OUTPUT
+          echo "Generated filename: ${FILENAME}"
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp aws.yaml s3://duploservices-ai-access-227120241369/${{ steps.filename.outputs.filename }}
+          echo "Uploaded to: s3://duploservices-ai-access-227120241369/${{ steps.filename.outputs.filename }}"
