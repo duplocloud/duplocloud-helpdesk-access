@@ -31,7 +31,7 @@ jobs:
         env:
           DUPLO_HOST: https://prod.duplocloud.net
           DUPLO_TOKEN: ${{ secrets.DUPLO_PROD_TOKEN }}
-          DUPLO_TENANT: 5cd3b897-e4d2-4049-85b8-8dd9ab5232de
+          DUPLO_TENANT: ai
 
       - name: Verify AWS credentials
         run: |
