@@ -7,6 +7,9 @@ on:
     branches: [dev]
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+
 jobs:
   upload:
     name: Upload versioned aws.yaml to S3
@@ -16,6 +19,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify aws.yaml exists
+        run: |
+          if [ ! -f aws.yaml ]; then
+            echo "Error: aws.yaml not found in repository root"
+            exit 1
+          fi
+
       - name: Setup DuploCtl
         uses: duplocloud/actions/setup@v1
         with:
@@ -24,10 +34,16 @@ jobs:
         env:
           DUPLO_TENANT_ID: 5cd3b897-e4d2-4049-85b8-8dd9ab5232de
 
+      - name: Verify AWS credentials
+        run: |
+          aws sts get-caller-identity
+          echo "AWS credentials verified"
+
       - name: Generate versioned filename
         id: filename
         run: |
           BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          BRANCH_NAME="${BRANCH_NAME//\//-}"
           SHORT_SHA="${GITHUB_SHA:0:7}"
           FILENAME="aws-${BRANCH_NAME}-${SHORT_SHA}.yaml"
           echo "filename=${FILENAME}" >> $GITHUB_OUTPUT
@@ -35,5 +51,8 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 cp aws.yaml s3://duploservices-ai-access-227120241369/${{ steps.filename.outputs.filename }}
-          echo "Uploaded to: s3://duploservices-ai-access-227120241369/${{ steps.filename.outputs.filename }}"
+          if ! aws s3 cp aws.yaml s3://duploservices-ai-access-227120241369/${{ steps.filename.outputs.filename }}; then
+            echo "Error: Failed to upload to S3"
+            exit 1
+          fi
+          echo "Successfully uploaded to: s3://duploservices-ai-access-227120241369/${{ steps.filename.outputs.filename }}"
