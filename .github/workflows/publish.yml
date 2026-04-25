@@ -1,0 +1,45 @@
+name: "Publish: Upload to S3"
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    name: Upload canonical aws.yaml to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify aws.yaml exists
+        run: |
+          if [ ! -f aws.yaml ]; then
+            echo "Error: aws.yaml not found in repository root"
+            exit 1
+          fi
+
+      - name: Setup DuploCtl
+        uses: duplocloud/actions/setup@v1
+        with:
+          duplo_host: https://prod.duplocloud.net
+          duplo_token: ${{ secrets.DUPLO_PROD_TOKEN }}
+        env:
+          DUPLO_TENANT_ID: 5cd3b897-e4d2-4049-85b8-8dd9ab5232de
+
+      - name: Verify AWS credentials
+        run: |
+          aws sts get-caller-identity
+          echo "AWS credentials verified"
+
+      - name: Upload to S3
+        run: |
+          if ! aws s3 cp aws.yaml s3://duploservices-ai-access-227120241369/aws.yaml; then
+            echo "Error: Failed to upload to S3"
+            exit 1
+          fi
+          echo "Successfully uploaded canonical aws.yaml to S3"
