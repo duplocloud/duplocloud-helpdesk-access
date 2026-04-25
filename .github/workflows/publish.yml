@@ -24,7 +24,7 @@ jobs:
           fi
 
       - name: Setup DuploCtl
-        uses: duplocloud/actions/setup@v1
+        uses: duplocloud/actions/setup@main
         with:
           duplo_host: https://prod.duplocloud.net
           duplo_token: ${{ secrets.DUPLO_PROD_TOKEN }}
