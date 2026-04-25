@@ -28,11 +28,10 @@ jobs:
 
       - name: Setup DuploCloud AWS Credentials
         uses: duplocloud/actions@main
-        with:
-          duplo_host: https://prod.duplocloud.net
-          duplo_token: ${{ secrets.DUPLO_PROD_TOKEN }}
         env:
-          DUPLO_TENANT_ID: 5cd3b897-e4d2-4049-85b8-8dd9ab5232de
+          DUPLO_HOST: https://prod.duplocloud.net
+          DUPLO_TOKEN: ${{ secrets.DUPLO_PROD_TOKEN }}
+          DUPLO_TENANT: 5cd3b897-e4d2-4049-85b8-8dd9ab5232de
 
       - name: Verify AWS credentials
         run: |
